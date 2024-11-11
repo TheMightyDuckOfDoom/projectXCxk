@@ -3,4 +3,4 @@ designs/*.lca
 designs/*.LOG
 designs/*.BIT
 designs/*.MBO
-*/__pycache__/
+**/__pycache__/

@@ -36,11 +36,12 @@ START-UP REQUIRES THREE CONFIGURATION CLOCKS BEYOND LENGTH COUNT
 '''
 
 class Parser(object):
-    def __init__(self, bits, dev='xc2064'):
-        assert(dev in ['xc2018', 'xc2064'])
+    def __init__(self, bits, dev):
+        if(dev not in ['2018', '2064']):
+            raise Exception('unknown device %s' % dev)
         self.dev = dev
-        self.nframes =      {'xc2018': 196, 'xc2064': 160}[dev]
-        self.frame_bits =   {'xc2018': 87,  'xc2064': 71}[dev]
+        self.nframes =      {'2018': 196, '2064': 160}[dev]
+        self.frame_bits =   {'2018': 87,  '2064': 71}[dev]
         self.bits = bits
         self.cfglen = None
 

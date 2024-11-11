@@ -15,8 +15,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from xc2k import parser
-from xc2k import container
+from fuzzer.xc2k import parser
+from fuzzer.xc2k import container
 
 def print_header(header):
     print('header')
@@ -28,9 +28,9 @@ def print_header(header):
 def print_frame(frame, id):
     print(f'frame{id}: {frame["payload"]}')
 
-def run(file1, file2, format):
-    pfile1 = parser.Parser(container.getbits(file1, format))
-    pfile2 = parser.Parser(container.getbits(file2, format))
+def run(file1, file2, format, dev):
+    pfile1 = parser.Parser(container.getbits(file1, format), dev)
+    pfile2 = parser.Parser(container.getbits(file2, format), dev)
 
     header1 = pfile1.header()
     header2 = pfile2.header()
@@ -84,10 +84,11 @@ def main():
 
     parser.add_argument('--verbose', type=int, help='')
     parser.add_argument('--format', default='BIT', help='One of: bin, bit, rom')
+    parser.add_argument('--device', default='2046', help='Device')
     parser.add_argument('file1', help='Input file')
     parser.add_argument('file2', help='Input file')
     args = parser.parse_args()
-    run(open(args.file1, 'rb'), open(args.file2, 'rb'), format=args.format)
+    run(open(args.file1, 'rb'), open(args.file2, 'rb'), format=args.format, dev=args.device)
 
 if __name__ == '__main__':
     main()
