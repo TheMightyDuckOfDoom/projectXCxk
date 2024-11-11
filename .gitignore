@@ -1,0 +1,6 @@
+XACT/
+designs/*.lca
+designs/*.LOG
+designs/*.BIT
+designs/*.MBO
+*/__pycache__/
