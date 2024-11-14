@@ -33,7 +33,11 @@ def getbits_bin(f):
 def getbits_bit(f):
     # .BIT w/ header
     buff = f.read()
-    buff = buff[0x76:]
+    start_loc = buff.find(b'\xFF')
+    preamble_loc = buff.find(b'\x20')
+    if preamble_loc != start_loc + 1:
+        raise Exception('Preamble not found')   
+    buff = buff[start_loc:]
     return bitstring.ConstBitStream(bytes=buff)
 
 def getbits_rom(f):

@@ -33,12 +33,14 @@ def lca2bit(lca_dir, design_name):
     '''
     Take LCA text file named {design_name}.LCA in lca_dir and compile to BIT file in same directory
     ''' 
+    name = design_name[:7]
     batch = f'''\
 D:
 CD D:\DATA
-D:\MAKEBITS -V -O C:\{design_name}.BIT C:\{design_name}.LCA > C:\DESIGN.LOG
+D:\MAKEBITS -V -O C:\{design_name}.BIT C:\{design_name}.LCA > C:\{name}.LOG
 '''
-    batch_fn = os.path.join(lca_dir, 'RUN.BAT')
+    batch_name = name + '.BAT'
+    batch_fn = os.path.join(lca_dir, batch_name)
     try:
         open(batch_fn, 'w').write(batch)
         result = subprocess.check_output('SDL_VIDEODRIVER=dummy dosbox %s -c "MOUNT D: %s" -exit >/dev/null' % (batch_fn, XACT_DIR), shell=True, text=True)
@@ -46,6 +48,6 @@ D:\MAKEBITS -V -O C:\{design_name}.BIT C:\{design_name}.LCA > C:\DESIGN.LOG
     finally:
         if os.path.exists(batch_fn):
             os.unlink(batch_fn)
-        with open(os.path.join(lca_dir, 'DESIGN.LOG')) as f:
+        with open(os.path.join(lca_dir, f'{name}.LOG')) as f:
             log = f.read()
             return log

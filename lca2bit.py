@@ -2,7 +2,7 @@
 
 # Tobias Senti <git@tsenti.li>
 
-from fuzzer.xc2k import xact
+from fuzzer.xcxk import xact
 
 def main():
     import argparse

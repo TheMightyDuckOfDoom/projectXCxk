@@ -35,13 +35,15 @@ BITS PER FRAME    87            71
 START-UP REQUIRES THREE CONFIGURATION CLOCKS BEYOND LENGTH COUNT
 '''
 
+from . import devices
+
 class Parser(object):
     def __init__(self, bits, dev):
-        if(dev not in ['2018', '2064']):
-            raise Exception('unknown device %s' % dev)
+        if not devices.is_device_valid(dev):
+            raise Exception('Invalid device %s' % dev)
         self.dev = dev
-        self.nframes =      {'2018': 196, '2064': 160}[dev]
-        self.frame_bits =   {'2018': 87,  '2064': 71}[dev]
+        self.nframes = devices.get_dev_num_frames(dev)
+        self.frame_bits = devices.get_dev_frame_bits(dev)
         self.bits = bits
         self.cfglen = None
 

@@ -1,6 +1,12 @@
 XACT/
 designs/*.lca
+designs/*.LCA
 designs/*.LOG
 designs/*.BIT
 designs/*.MBO
+designs/*.BAT
+results/*_LOCAL_LONG_PIPS_*.txt
+results/*_MAPPING_*.txt
+synth/out/*.v
+synth/out/*.json
 **/__pycache__/

@@ -15,8 +15,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from fuzzer.xc2k import parser
-from fuzzer.xc2k import container
+from fuzzer.xcxk import parser
+from fuzzer.xcxk import container
 
 def print_header(header):
     print('header')
@@ -84,7 +84,7 @@ def main():
 
     parser.add_argument('--verbose', type=int, help='')
     parser.add_argument('--format', default='BIT', help='One of: bin, bit, rom')
-    parser.add_argument('--device', default='2046', help='Device')
+    parser.add_argument('--device', default='', help='Device')
     parser.add_argument('file1', help='Input file')
     parser.add_argument('file2', help='Input file')
     args = parser.parse_args()

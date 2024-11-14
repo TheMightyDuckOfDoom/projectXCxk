@@ -1,5 +1,5 @@
-from xc2k import parser
-from xc2k import container
+from xcxk import parser
+from xcxk import container
 
 def bit2bits(fin, fout, format='BIT'):
     bit2bitsf(open(fin, 'r'), open(fout, 'w'))
