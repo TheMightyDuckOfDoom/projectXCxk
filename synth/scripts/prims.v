@@ -2,32 +2,24 @@ module LUT #(
 	parameter K = 4,
 	parameter [2**K-1:0] INIT = 0
 ) (
-	input [K-1:0] I,
-	output F
+	input I0, I1, I2, I3, I4,
+	output O
 );
-	wire [K-1:0] I_pd;
 
-	genvar ii;
-	generate
-		for (ii = 0; ii < K; ii = ii + 1'b1)
-			assign I_pd[ii] = (I[ii] === 1'bz) ? 1'b0 : I[ii];
-	endgenerate
-
-	assign F = INIT[I_pd];
 endmodule
 
 module DFF #(
 	parameter ENABLE_USED = 1'b0,
 	parameter RST_USED = 1'b0
 ) (
-	input CLK, D, EN, RST_N,
+	input C, D, CE, RD,
 	output reg Q
 );
 	initial Q = 1'b0;
-	always @(posedge CLK) begin
-		if (RST_USED && !RST_N)
+	always @(posedge C) begin
+		if (RST_USED && !RD)
 			Q <= 1'b0;
-		else if (!ENABLE_USED || (ENABLE_USED && EN))
+		else if (!ENABLE_USED || (ENABLE_USED && CE))
 			Q <= D;
 	end
 endmodule
@@ -53,8 +45,8 @@ module IOB #(
 endmodule
 
 module IBUF (
-	(* iopad_external_pin *) input PAD,
-	output I
+	(* iopad_external_pin *) input I,
+	output O
 );
 	IOB #(
 		.INPUT_USED(1'b1)
@@ -62,19 +54,19 @@ module IBUF (
 		.PAD(PAD),
 		.O(),
 		.EN(1'b1),
-		.I(I)
+		.I(O)
 	);
 endmodule
 
 module OBUF (
-	(* iopad_external_pin *) output PAD,
-	input O
+	(* iopad_external_pin *) output O,
+	input I
 );
 	IOB #(
 		.OUTPUT_USED(1'b1)
 	) _TECHMAP_REPLACE_ (
 		.PAD(PAD),
-		.O(O),
+		.O(I),
 		.EN(),
 		.I()
 	);

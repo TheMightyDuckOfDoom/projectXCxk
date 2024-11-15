@@ -12,11 +12,12 @@ deminout
 synth -run coarse
 memory_map
 opt -full
-iopadmap -bits -inpad IBUF I:PAD -outpad OBUF O:PAD
+iopadmap -bits -inpad IBUF O:I -outpad OBUF I:O
 stat
 techmap -map +/techmap.v
 opt -full
-dfflegalize -cell \$_DFF_P_ x -cell \$_DFFE_PP_ x -cell \$_SDFF_PN0_ x -cell \$_SDFFE_PN0P_ x -mince 4 -minsrst 4
+dfflegalize -cell \$_DFF_P_ x -cell \$_DFFE_PP_ x
+# -cell \$_SDFF_PN0_ x -cell \$_SDFFE_PN0P_ x
 stat
 abc9 -lut $LUT_K
 clean
