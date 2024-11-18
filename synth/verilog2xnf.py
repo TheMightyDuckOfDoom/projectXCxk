@@ -119,11 +119,11 @@ def run(filename, out_filename, device, package):
                     if (lut_table & (1 << i)) == 0:
                         continue
                     if len(eqn) > 0:
-                        eqn += ' + '
+                        eqn += '+'
                     eqn += f'('
                     for k in range(0, lut_k):
                         if k > 0:
-                            eqn += ' * '
+                            eqn += '*'
                         if i & (1 << k):
                             eqn += f'I{k}'
                         else:
@@ -131,7 +131,11 @@ def run(filename, out_filename, device, package):
                     eqn += ')'
 
                 line = f'SYM, {instance["name"]}, EQN, EQN={eqn}\n'
-                assert(len(line) < 1024)
+                if len(line) >= 1024:
+                    print(f'Warning: EQN too long for {instance["name"]}')
+                    print(f'EQN={eqn}')
+                    print(f'Length={len(line)}')
+                    exit(1)
                 f.write(line)
                 for port in instance['ports']:
                     f.write(f'PIN, {port[0]}, {pin_direction[instance["module"]][port[0]]}, {port[1]}\n')
