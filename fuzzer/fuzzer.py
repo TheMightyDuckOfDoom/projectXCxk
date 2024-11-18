@@ -69,6 +69,46 @@ def fuzz_clb_local_long_pips_exist(device, package, speed, split_start, split_en
                     f.flush()
                 f.write('\n')
 
+def fuzz_magic_connections(device, package, speed, split_start, split_end):
+    rows = devices.get_device_rows(device)[:-1]
+    cols = devices.get_device_cols(device)[:-1]
+    filename = f'./results/{device}{package}_MAGIC_CONNECTIONS'
+
+    if split_start != '' and split_end != '':
+        if split_start in rows and split_end in rows:
+            rows = rows[rows.index(split_start):rows.index(split_end)+1]
+            filename += f'_{split_start}_to_{split_end}'
+        else:
+            print('Invalid split range')
+            exit(1)
+
+    with open(filename + '.txt', 'w') as f:
+        for row in rows:
+            for col in cols:
+                lca = ''
+                name = f'{row}{col}.20.1.'
+
+                conn_name = []
+                for start in range(0, 20):
+                    for end in range(0, 20):
+                        if start == end:
+                            continue
+                        lca += f'NProgram {name}{start} {name}{end}\n'
+                        conn_name.append((start, end))
+
+                filename = f'{row}{col}_MAG'
+                filename = utils.create_lca(filename, device, package, speed, lca, True)
+                log = utils.create_bit(filename)
+                print(log)
+
+                for (start, end) in conn_name:
+                    if f'Pin {start+1} and {end+1}: Unconnectable.' not in log:
+                        if f'`{name}{start}\' is not programmable.' not in log and f'`{name}{end}\' is not programmable.' not in log:
+                            print(f'{name}{start} {name}{end}')
+                            f.write(f'{name}{start} {name}{end}\n')
+                            f.flush()
+                f.write('\n')
+
 def main():
     import argparse
 
@@ -97,6 +137,10 @@ def main():
 
     if args.target == 'clb-local-long-pips':
         fuzz_clb_local_long_pips_exist(device, package, speed, split_start, split_end)
+        exit(1)
+
+    if args.target == 'magic-connections':
+        fuzz_magic_connections(device, package, speed, split_start, split_end)
         exit(1)
 
     print('Creating empty bitstream')
