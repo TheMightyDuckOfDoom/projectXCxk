@@ -9,7 +9,7 @@ import subprocess
 def clean_name(name):
     return name.replace('[', '_').replace(']', '_').replace('\\', '').replace('.', '_')
 
-def part_design(filename, out_filename, partitions):
+def part_design(filename, out_filename, partitions, norun):
     ast, directives = parse(open(filename, 'r'))
 
     desc = ast.description
@@ -104,8 +104,9 @@ def part_design(filename, out_filename, partitions):
     tcl_filename = out_filename + '.tcl'
     try:
         open(tcl_filename, 'w').write(f'''triton_part_hypergraph -hypergraph_file {out_filename} -num_parts {partitions}; exit;''')
-        #result = subprocess.check_output(['openroad', tcl_filename, '-threads', 'max'], text=True)
-        #print(result)
+        if not norun:
+            result = subprocess.check_output(['openroad', tcl_filename, '-threads', 'max'], text=True)
+            print(result)
     finally:
         print('Done')
         #if os.path.exists(tcl_filename):
@@ -166,9 +167,10 @@ def main():
     parser.add_argument('fin', help='Input file')
     parser.add_argument('fout', help='Output file')
     parser.add_argument('--partitions', help='Number of partitions', default=2)
+    parser.add_argument('--norun', help='Do not run TritonPart', action='store_true')
     args = parser.parse_args()
 
-    part_design(args.fin, args.fout, args.partitions)
+    part_design(args.fin, args.fout, args.partitions, args.norun)
 
 if __name__ == '__main__':
     main()

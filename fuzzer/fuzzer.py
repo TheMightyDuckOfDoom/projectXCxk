@@ -3,6 +3,7 @@
 
 import utils
 import blk_pips
+import pip_bit
 from xcxk import parser
 from xcxk import container
 from xcxk import devices
@@ -109,6 +110,42 @@ def fuzz_magic_connections(device, package, speed, split_start, split_end):
                             f.flush()
                 f.write('\n')
 
+def fuzz_magic_connections_bitstream(device, package, speed, split_start, split_end, empty_header, empty_frames, empty_footer):
+    with open(f'./results/{device}{package}_MAGIC_CONNECTIONS.txt', 'r') as f:
+        filename = f'./results/{device}{package}_MAGIC_BITSTREAM'
+
+        rows = devices.get_device_rows(device)[:-1]
+        if split_start != '' and split_end != '':
+            if split_start in rows and split_end in rows:
+                rows = rows[rows.index(split_start):rows.index(split_end)+1]
+                filename += f'_{split_start}_to_{split_end}'
+            else:
+                print('Invalid split range')
+                exit(1)
+
+        with open(f'{filename}.txt', 'w') as diff:
+            for line in f:
+                if line == '\n' or line == '':
+                    continue
+                (start, end) = line.strip().split(' ')
+                if start[0] not in rows:
+                    continue
+
+                differences = pip_bit.fuzz_pip_bitstream(device, package, speed, f'{start} {end}', empty_header, empty_frames, empty_footer)
+                if len(differences) == 0:
+                    diff.write(f'{start} {end}:[]\n')
+                    print(f'{start} {end} has no differences')
+                elif len(differences) == 1:
+                    print(f'{start} {end}: {differences[0]}')
+                    diff.write(f'{start} {end}:{differences[0]}\n')
+                else:
+                    print(f'{start} {end} has multiple differences')
+                    print(differences)
+                    diff.write(f'{start} {end}:{differences[0]}\n')
+                    diff.write('multiple differences\n')
+                    exit(1)
+                diff.flush()
+
 def main():
     import argparse
 
@@ -144,14 +181,20 @@ def main():
         exit(1)
 
     print('Creating empty bitstream')
-    utils.create_lca('./designs/EMPTY.lca', device, package, speed, '')
-    utils.create_bit('EMPTY')
+    emptyfilename = utils.create_lca('EMPTY', device, package, speed, '', True)
+    utils.create_bit(emptyfilename)
 
-    parsed_empty = parser.Parser(container.getbits(open('./designs/EMPTY.BIT', 'rb'), 'BIT'), device)
+    parsed_empty = parser.Parser(container.getbits(open(f'./designs/{emptyfilename}.BIT', 'rb'), 'BIT'), device)
 
     empty_header = parsed_empty.header()
     empty_frames = parsed_empty.frames_raw()
     empty_footer = parsed_empty.footer()
+
+    if args.target == 'magic-bitstream':
+        fuzz_magic_connections_bitstream(device, package, speed, split_start, split_end, empty_header, empty_frames, empty_footer)
+        exit(1)
+
+    print('Invalid target')
 
 if __name__ == "__main__":
     main();

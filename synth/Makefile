@@ -1,8 +1,11 @@
-DEVICE?=3020
+DEVICE?=3090
 PACKAGE?=PC84
 
-target?=mc14500
-target_src?=examples/$(target).v
+#target?=mc14500
+#target_src?=examples/$(target).v
+
+#target=servisia
+#target_src=~/servisia/out/servisia.v
 
 all: synth v2xnf implement
 
