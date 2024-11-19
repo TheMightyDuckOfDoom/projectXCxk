@@ -22,8 +22,6 @@ EMPTY:
 	$(LCA2BIT) $@
 	$(PARSE) designs/$@.BIT
 
-fuzz_all: fuzz_iob fuzz_clb fuzz_magic
-
 include fuzz_split.mk
 
 clean:

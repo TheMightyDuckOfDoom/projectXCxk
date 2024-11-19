@@ -23,7 +23,7 @@ devices = {
         'rows': 20,
         'cols': 16,
         'max_ios': 144,
-        'packages': ['PC84'],
+        'packages': ['PC84', 'PQ160'],
         'num_frames': 373,
         'frame_bits': 172 - 4,
     }
@@ -74,6 +74,16 @@ def get_device_iob_names(dev, package):
                 if i in [1, 2, 12, 13, 21, 22, 31, 32, 42, 43, 54, 55, 64, 65, 74]:
                     continue
                 iob_names.append(f'P{i}')
+            assert(len(iob_names) == 70)
+            return iob_names
+    elif package in ['PQ160']:
+        if dev in ['3090', '3195']:
+            iob_names = []
+            for i in range(1, 161):
+                if i in [19, 20, 40, 41, 42, 43, 60, 61, 77, 78, 79, 80, 100, 101, 121, 122, 123, 157, 158, 159, 160]:
+                    continue
+                iob_names.append(f'P{i}')
+            assert(len(iob_names) == 138)
             return iob_names
     
     return None

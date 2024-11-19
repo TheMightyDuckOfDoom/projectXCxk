@@ -8,6 +8,56 @@ from xcxk import parser
 from xcxk import container
 from xcxk import devices
 
+def fuzz_iob_local_long_pips_exist(device, package, speed, split_start, split_end, onlyiobmapping):
+    pads = devices.get_device_pad_names(device, package)
+
+    split = False
+    if split_start != '' and split_end != '':
+        if split_start in pads and split_end in pads:
+            pads = pads[pads.index(split_start):pads.index(split_end)+1]
+            split = True
+        else:
+            print('Invalid split range')
+            exit(1)
+
+    pips_filename = f'./results/{device}{package}/IOB_LOCAL_LONG_PIPS'
+    map_filename = f'./results/{device}{package}/IOB_MAPPING'
+    if split:
+        pips_filename += f'_{split_start}_to_{split_end}'
+        map_filename += f'_{split_start}_to_{split_end}'
+
+    if not onlyiobmapping:
+        open(pips_filename + '.txt', 'w').close()
+
+    with open(pips_filename + '.txt', 'a') as f:
+        with open(map_filename + '.txt', 'w') as map:
+            for pad in pads:
+                for pin in ['I', 'O', 'T', 'Q', 'IK', 'OK']:
+                    (pip_names, log) = pips.find_local_long_pips_for_block(device, package, speed, pad, pin, True)
+                    
+                    # Write pips
+                    if not onlyiobmapping:
+                        for pip in pip_names:
+                            f.write(f'{pad}.{pin} {pip}\n')
+                        f.write('\n')
+                        f.flush()
+
+                    # Write mapping
+                    if pin == 'I':
+                        iob_name = ''
+                        if 'Fixing unconnected pin P' in log:
+                            iob_name = 'P' + log.split('Fixing unconnected pin P')[1].split('.')[0]
+                        elif 'Fixing unconnected pin U' in log:
+                            iob_name = 'U' + log.split('Fixing unconnected pin U')[1].split('.')[0]
+                        else:
+                            print(f'Error: Could not find IOB name for {pad}')
+                            exit(1)
+                        
+                        map.write(f'{iob_name} {pad}\n')
+                        map.flush()
+
+                f.write('\n')
+
 def fuzz_iob_direct_exist(device, package, speed, split_start, split_end):
     pads = devices.get_device_pad_names(device, package)
     rows = devices.get_device_rows(device)[:-1]
@@ -16,9 +66,13 @@ def fuzz_iob_direct_exist(device, package, speed, split_start, split_end):
     perimeter_cols = [cols[0], cols[-1]]
 
     split = False
-    if split_start in pads and split_end in pads:
-        pads = pads[pads.index(split_start):pads.index(split_end)+1]
-        split = True
+    if split_start != '' and split_end != '':
+        if split_start in pads and split_end in pads:
+            pads = pads[pads.index(split_start):pads.index(split_end)+1]
+            split = True
+        else:
+            print('Invalid split range')
+            exit(1)
 
     pips_filename = f'./results/{device}{package}/IOB_DIRECT'
     if split:
@@ -27,8 +81,8 @@ def fuzz_iob_direct_exist(device, package, speed, split_start, split_end):
         for pad in pads:
             lca = ''
             pip_names = []
-            for pin in ['I', 'Q']:
-                for clb_pin in ['A', 'B', 'C', 'D', 'E', 'DI', 'EC', 'RD', 'K']:
+            for pin in ['I', 'Q', 'O', 'T']:
+                for clb_pin in ['A', 'B', 'C', 'D', 'E', 'DI', 'EC', 'RD', 'K'] if pin in ['I', 'Q'] else ['X', 'Y']:
                     for row in perimeter_rows:
                         for col in cols:
                             pip_name = f'{row}{col}.{clb_pin}:{pad}.{pin}'
@@ -57,22 +111,91 @@ def fuzz_iob_direct_exist(device, package, speed, split_start, split_end):
                 f.write('\n')
             f.flush()
 
+def fuzz_clb_direct_exist(device, package, speed, split_start, split_end):
+    rows = devices.get_device_rows(device)[:-1]
+    cols = devices.get_device_cols(device)[:-1]
+
+    all_rows = rows.copy()
+
+    split = False
+    if split_start != '' and split_end != '':
+        if split_start in rows and split_end in rows:
+            rows = rows[rows.index(split_start):rows.index(split_end)+1]
+            split = True
+        else:
+            print('Invalid split range')
+            exit(1)
+
+    pips_filename = f'./results/{device}{package}/CLB_DIRECT'
+    if split:
+        pips_filename += f'_{split_start}_to_{split_end}'
+
+    with open(pips_filename + '.txt', 'w') as f:
+        for r_idx, row in enumerate(all_rows):
+            if row not in rows:
+                continue
+            for c_idx, col in enumerate(cols):
+                lca = ''
+                pip_names = []
+                for out in ['X', 'Y']:
+                    for inp in ['A', 'B', 'C', 'D', 'E', 'DI', 'EC', 'RD', 'K']:
+                        if r_idx > 0:
+                            pip_name = f'{row}{col}.{out}:{all_rows[r_idx-1]}{col}.{inp}'
+                            if pip_name not in pip_names:
+                                pip_names.append(pip_name)
+                                lca += f'NProgram {pip_name}\n'
+                        if r_idx < len(all_rows)-1:
+                            pip_name = f'{row}{col}.{out}:{all_rows[r_idx+1]}{col}.{inp}'
+                            if pip_name not in pip_names:
+                                pip_names.append(pip_name)
+                                lca += f'NProgram {pip_name}\n'
+
+                        if c_idx > 0:
+                            pip_name = f'{row}{col}.{out}:{row}{cols[c_idx-1]}.{inp}'
+                            if pip_name not in pip_names:
+                                pip_names.append(pip_name)
+                                lca += f'NProgram {pip_name}\n'
+                        if c_idx < len(cols)-1:
+                            pip_name = f'{row}{col}.{out}:{row}{cols[c_idx+1]}.{inp}'
+                            if pip_name not in pip_names:
+                                pip_names.append(pip_name)
+                                lca += f'NProgram {pip_name}\n'
+
+                filename = f'{row}{col}_DIR'
+                filename = utils.create_lca(filename, device, package, speed, lca, True)
+                log = utils.create_bit(filename)
+
+                empty = True
+                for pip_name in pip_names:
+                    if f'`{pip_name}\' is not programmable.' not in log:
+                        name = pip_name.split(':')[0]
+                        f.write(f'{name} {pip_name}\n')
+                        f.flush()
+                        empty = False
+                if not empty:
+                    f.write('\n')
+                f.flush()
+
 def fuzz_clb_local_long_pips_exist(device, package, speed, split_start, split_end):
     rows = devices.get_device_rows(device)[:-1]
     cols = devices.get_device_cols(device)[:-1]
     filename = f'./results/{device}{package}/CLB_LOCAL_LONG_PIPS'
 
-    if split_start in rows and split_end in rows:
-        rows = rows[rows.index(split_start):rows.index(split_end)+1]
-        filename += f'_{split_start}_to_{split_end}'
+    if split_start != '' and split_end != '':
+        if split_start in rows and split_end in rows:
+            rows = rows[rows.index(split_start):rows.index(split_end)+1]
+            filename += f'_{split_start}_to_{split_end}'
+        else:
+            print('Invalid split range')
+            exit(1)
 
     with open(filename + '.txt', 'w') as f:
         for row in rows:
             for col in cols:
                 for pin in ['A', 'B', 'C', 'D', 'E', 'DI', 'EC', 'RD', 'K', 'X', 'Y']:
                     name = f'{row}{col}'
-                    (pips, log) = pips.find_local_long_pips_for_block(device, package, speed, name, pin, True)
-                    for pip in pips:
+                    (pip_names, log) = pips.find_local_long_pips_for_block(device, package, speed, name, pin, True)
+                    for pip in pip_names:
                         f.write(f'{name}.{pin} {pip}\n')
                     f.write('\n')
                     f.flush()
@@ -82,14 +205,18 @@ def fuzz_local_long_pips_exist(device, package, speed, split_start, split_end):
     rows = devices.get_device_rows(device)
     filename = f'./results/{device}{package}/LOCAL_LONG_PIPS'
 
-    if split_start in rows and split_end in rows:
-        rows = rows[rows.index(split_start):rows.index(split_end)+1]
-        filename += f'_{split_start}_to_{split_end}'
+    if split_start != '' and split_end != '':
+        if split_start in rows and split_end in rows:
+            rows = rows[rows.index(split_start):rows.index(split_end)+1]
+            filename += f'_{split_start}_to_{split_end}'
+        else:
+            print('Invalid split range')
+            exit(1)
 
     with open(filename + '.txt', 'w') as f:
         for row in rows:
-            (pips, log) = pips.find_local_long_pips(device, package, speed, row)
-            for pip in pips:
+            (pip_names, log) = pips.find_local_long_pips(device, package, speed, row)
+            for pip in pip_names:
                 f.write(f'{pip}\n')
             f.write('\n\n')
             f.flush()
@@ -180,6 +307,7 @@ def main():
     arg_parser.add_argument('--target', default='iob-config', help='Target')
     arg_parser.add_argument('--split_start', default='', help='Split the fuzz job')
     arg_parser.add_argument('--split_end', default='', help='Split the fuzz job')
+    arg_parser.add_argument('--onlyiobmapping', default=False, action='store_true', help='Only generate IOB mapping')
 
     args = arg_parser.parse_args()
     device = args.device
@@ -193,7 +321,7 @@ def main():
         exit(1)
 
     if args.target == 'iob-local-long-pips':
-        fuzz_iob_local_long_pips_exist(device, package, speed, split_start, split_end)
+        fuzz_iob_local_long_pips_exist(device, package, speed, split_start, split_end, args.onlyiobmapping)
         exit(1)
 
     if args.target == 'clb-local-long-pips':
@@ -210,6 +338,10 @@ def main():
 
     if args.target == 'iob-direct-pips':
         fuzz_iob_direct_exist(device, package, speed, split_start, split_end)
+        exit(1)
+
+    if args.target == 'clb-direct-pips':
+        fuzz_clb_direct_exist(device, package, speed, split_start, split_end)
         exit(1)
 
     print('Creating empty bitstream')

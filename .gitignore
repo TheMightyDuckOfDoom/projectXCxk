@@ -1,7 +1,6 @@
 XACT/
 designs/*.*
-results/*_LOCAL_LONG_PIPS_*.txt
-results/*_MAPPING_*.txt
+results/.backup
 synth/out/*.*
 synth/parser.out
 synth/parsetab.py

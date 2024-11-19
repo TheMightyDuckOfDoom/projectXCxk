@@ -1,20 +1,37 @@
 FUZZ_IOB=iob-local-long-pips iob-direct-pips
-FUZZ_ROW_MINUS_ONE=clb-local-long-pips 
-FUZZ_ROW=magic-connections magic-bitstream local-long-pips
+FUZZ_ROW_MINUS_ONE=clb-local-long-pips clb-direct-pips
+FUZZ_ROW=magic-connections local-long-pips
 RESULT_FOLDER=$(DEVICE)$(PACKAGE)
+TIMESTAMP=$(shell date +%Y_%m_%d_%H_%M_%S)
+ARGS=
 
 $(RESULT_FOLDER):
 	mkdir -p ./results/$(RESULT_FOLDER)
 
+fuzz_all: $(FUZZ_IOB) $(FUZZ_ROW_MINUS_ONE) $(FUZZ_ROW)
+
+fuzz_onlyiobmapping: ARGS=--onlyiobmapping
+fuzz_onlyiobmapping: iob-local-long-pips
+
 $(FUZZ_IOB): $(RESULT_FOLDER)
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD1 --split_end PAD18 &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD19 --split_end PAD37 &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD38 --split_end PAD56 &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD57 --split_end PAD75 &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD76 --split_end PAD94 &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD95 --split_end PAD113 &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD114 --split_end PAD132 &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD133 --split_end PAD144 &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD1   --split_end PAD8   $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD9   --split_end PAD16  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD17  --split_end PAD24  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD25  --split_end PAD32  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD33  --split_end PAD40  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD41  --split_end PAD48  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD49  --split_end PAD56  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD57  --split_end PAD64  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD65  --split_end PAD72  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD73  --split_end PAD80  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD81  --split_end PAD88  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD89  --split_end PAD96  $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD97  --split_end PAD104 $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD105 --split_end PAD112 $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD113 --split_end PAD120 $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD121 --split_end PAD128 $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD129 --split_end PAD136 $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD137 --split_end PAD144 $(ARGS) &
 
 $(FUZZ_ROW_MINUS_ONE): $(RESULT_FOLDER)
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start A --split_end A &
@@ -68,16 +85,24 @@ $(FUZZ_ROW): $(RESULT_FOLDER)
 
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start U --split_end U &
 
-merge_fuzz: $(RESULT_FOLDER)
-#ls -v ./results/${DEVICE}${PACKAGE}/CLB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/CLB_LOCAL_LONG_PIPS.txt
-#ls -v ./results/${DEVICE}${PACKAGE}/IOB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_LOCAL_LONG_PIPS.txt
-#ls -v ./results/${DEVICE}${PACKAGE}/IOB_MAPPING_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_MAPPING.txt
-#ls -v ./results/${DEVICE}${PACKAGE}/MAGIC_CONNECTIONS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/MAGIC_CONNECTIONS.txt
-#ls -v ./results/${DEVICE}${PACKAGE}/MAGIC_BITSTREAM_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/MAGIC_BITSTREAM.txt
-#ls -v ./results/${DEVICE}${PACKAGE}/LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/LOCAL_LONG_PIPS.txt
-#ls -v ./results/${DEVICE}${PACKAGE}/IOB_DIRECT_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_DIRECT.txt
+fuzz_backup: $(RESULT_FOLDER)
+	mkdir -p ./results/.backup/
+	cp ./results/$(DEVICE)$(PACKAGE) ./results/.backup/$(DEVICE)$(PACKAGE)_${TIMESTAMP} -r
 
-clean_fuzz:
+merge_iobmapping: fuzz_backup
+	ls -v ./results/${DEVICE}${PACKAGE}/IOB_MAPPING_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_MAPPING.txt
+
+merge_fuzz: fuzz_backup
+	ls -v ./results/${DEVICE}${PACKAGE}/CLB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/CLB_LOCAL_LONG_PIPS.txt
+	ls -v ./results/${DEVICE}${PACKAGE}/IOB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_LOCAL_LONG_PIPS.txt
+	ls -v ./results/${DEVICE}${PACKAGE}/IOB_MAPPING_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_MAPPING.txt
+	ls -v ./results/${DEVICE}${PACKAGE}/MAGIC_CONNECTIONS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/MAGIC_CONNECTIONS.txt
+	ls -v ./results/${DEVICE}${PACKAGE}/MAGIC_BITSTREAM_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/MAGIC_BITSTREAM.txt
+	ls -v ./results/${DEVICE}${PACKAGE}/LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/LOCAL_LONG_PIPS.txt
+	ls -v ./results/${DEVICE}${PACKAGE}/IOB_DIRECT_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_DIRECT.txt
+	ls -v ./results/${DEVICE}${PACKAGE}/CLB_DIRECT_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/CLB_DIRECT.txt
+
+clean_fuzz: fuzz_backup
 	rm -f ./results/${DEVICE}${PACKAGE}/CLB_LOCAL_LONG_PIPS_*.txt
 	rm -f ./results/${DEVICE}${PACKAGE}/IOB_LOCAL_LONG_PIPS_*.txt
 	rm -f ./results/${DEVICE}${PACKAGE}/IOB_MAPPING_*.txt
@@ -85,3 +110,4 @@ clean_fuzz:
 	rm -f ./results/${DEVICE}${PACKAGE}/MAGIC_BITSTREAM_*.txt
 	rm -f ./results/${DEVICE}${PACKAGE}/LOCAL_LONG_PIPS_*.txt
 	rm -f ./results/${DEVICE}${PACKAGE}/IOB_DIRECT_*.txt
+	rm -f ./results/${DEVICE}${PACKAGE}/CLB_DIRECT_*.txt
