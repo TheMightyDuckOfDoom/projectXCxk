@@ -1,8 +1,8 @@
 DEVICE?=3090
 PACKAGE?=PC84
 
-#target?=mc14500
-#target_src?=examples/$(target).v
+target?=mc14500
+target_src?=examples/$(target).v
 
 #target=servisia
 #target_src=~/servisia/out/servisia.v

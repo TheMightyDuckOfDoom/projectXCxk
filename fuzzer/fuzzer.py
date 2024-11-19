@@ -2,57 +2,65 @@
 # Tobias Senti <git@tsenti.li>
 
 import utils
-import blk_pips
+import pips
 import pip_bit
 from xcxk import parser
 from xcxk import container
 from xcxk import devices
 
-def fuzz_iob_local_long_pips_exist(device, package, speed, split_start, split_end):
+def fuzz_iob_direct_exist(device, package, speed, split_start, split_end):
     pads = devices.get_device_pad_names(device, package)
+    rows = devices.get_device_rows(device)[:-1]
+    perimeter_rows = [rows[0], rows[-1]]
+    cols = devices.get_device_cols(device)[:-1]
+    perimeter_cols = [cols[0], cols[-1]]
 
     split = False
     if split_start in pads and split_end in pads:
         pads = pads[pads.index(split_start):pads.index(split_end)+1]
         split = True
 
-    pips_filename = f'./results/{device}{package}_IOB_LOCAL_LONG_PIPS'
-    map_filename = f'./results/{device}{package}_IOB_MAPPING'
+    pips_filename = f'./results/{device}{package}/IOB_DIRECT'
     if split:
         pips_filename += f'_{split_start}_to_{split_end}'
-        map_filename += f'_{split_start}_to_{split_end}'
     with open(pips_filename + '.txt', 'w') as f:
-        with open(map_filename + '.txt', 'w') as map:
-            for pad in pads:
-                for pin in ['I', 'O', 'T', 'Q', 'IK', 'OK']:
-                    (pips, log) = blk_pips.find_local_long_pips_for_block(device, package, speed, pad, pin, True)
-                    
-                    # Write pips
-                    for pip in pips:
-                        f.write(f'{pad}.{pin} {pip}\n')
-                    f.write('\n')
+        for pad in pads:
+            lca = ''
+            pip_names = []
+            for pin in ['I', 'Q']:
+                for clb_pin in ['A', 'B', 'C', 'D', 'E', 'DI', 'EC', 'RD', 'K']:
+                    for row in perimeter_rows:
+                        for col in cols:
+                            pip_name = f'{row}{col}.{clb_pin}:{pad}.{pin}'
+                            if pip_name not in pip_names:
+                                pip_names.append(pip_name)
+                                lca += f'NProgram {pip_name}\n'
+                    for row in rows:
+                        for col in perimeter_cols:
+                            pip_name = f'{row}{col}.{clb_pin}:{pad}.{pin}'
+                            if pip_name not in pip_names:
+                                pip_names.append(pip_name)
+                                lca += f'NProgram {pip_name}\n'
+
+            filename = f'{pad}_IOB'
+            filename = utils.create_lca(filename, device, package, speed, lca, True)
+            log = utils.create_bit(filename)
+
+            empty = True
+            for pip_name in pip_names:
+                if f'`{pip_name}\' is not programmable.' not in log:
+                    name = pip_name.split(':')[1]
+                    f.write(f'{name} {pip_name}\n')
                     f.flush()
-
-                    # Write mapping
-                    if pin == 'I':
-                        iob_name = ''
-                        if 'Fixing unconnected pin P' in log:
-                            iob_name = 'P' + log.split('Fixing unconnected pin P')[1].split('.')[0]
-                        elif 'Fixing unconnected pin U' in log:
-                            iob_name = 'U' + log.split('Fixing unconnected pin U')[1].split('.')[0]
-                        else:
-                            print(f'Error: Could not find IOB name for {pad}')
-                            exit(1)
-                        
-                        map.write(f'{iob_name} {pad}\n')
-                        map.flush()
-
+                    empty = False
+            if not empty:
                 f.write('\n')
+            f.flush()
 
 def fuzz_clb_local_long_pips_exist(device, package, speed, split_start, split_end):
     rows = devices.get_device_rows(device)[:-1]
     cols = devices.get_device_cols(device)[:-1]
-    filename = f'./results/{device}{package}_CLB_LOCAL_LONG_PIPS'
+    filename = f'./results/{device}{package}/CLB_LOCAL_LONG_PIPS'
 
     if split_start in rows and split_end in rows:
         rows = rows[rows.index(split_start):rows.index(split_end)+1]
@@ -63,17 +71,33 @@ def fuzz_clb_local_long_pips_exist(device, package, speed, split_start, split_en
             for col in cols:
                 for pin in ['A', 'B', 'C', 'D', 'E', 'DI', 'EC', 'RD', 'K', 'X', 'Y']:
                     name = f'{row}{col}'
-                    (pips, log) = blk_pips.find_local_long_pips_for_block(device, package, speed, name, pin, True)
+                    (pips, log) = pips.find_local_long_pips_for_block(device, package, speed, name, pin, True)
                     for pip in pips:
                         f.write(f'{name}.{pin} {pip}\n')
                     f.write('\n')
                     f.flush()
                 f.write('\n')
 
+def fuzz_local_long_pips_exist(device, package, speed, split_start, split_end):
+    rows = devices.get_device_rows(device)
+    filename = f'./results/{device}{package}/LOCAL_LONG_PIPS'
+
+    if split_start in rows and split_end in rows:
+        rows = rows[rows.index(split_start):rows.index(split_end)+1]
+        filename += f'_{split_start}_to_{split_end}'
+
+    with open(filename + '.txt', 'w') as f:
+        for row in rows:
+            (pips, log) = pips.find_local_long_pips(device, package, speed, row)
+            for pip in pips:
+                f.write(f'{pip}\n')
+            f.write('\n\n')
+            f.flush()
+
 def fuzz_magic_connections(device, package, speed, split_start, split_end):
-    rows = devices.get_device_rows(device)[:-1]
-    cols = devices.get_device_cols(device)[:-1]
-    filename = f'./results/{device}{package}_MAGIC_CONNECTIONS'
+    rows = devices.get_device_rows(device)
+    cols = devices.get_device_cols(device)
+    filename = f'./results/{device}{package}/MAGIC_CONNECTIONS'
 
     if split_start != '' and split_end != '':
         if split_start in rows and split_end in rows:
@@ -111,8 +135,8 @@ def fuzz_magic_connections(device, package, speed, split_start, split_end):
                 f.write('\n')
 
 def fuzz_magic_connections_bitstream(device, package, speed, split_start, split_end, empty_header, empty_frames, empty_footer):
-    with open(f'./results/{device}{package}_MAGIC_CONNECTIONS.txt', 'r') as f:
-        filename = f'./results/{device}{package}_MAGIC_BITSTREAM'
+    with open(f'./results/{device}{package}/MAGIC_CONNECTIONS.txt', 'r') as f:
+        filename = f'./results/{device}{package}/MAGIC_BITSTREAM'
 
         rows = devices.get_device_rows(device)[:-1]
         if split_start != '' and split_end != '':
@@ -178,6 +202,14 @@ def main():
 
     if args.target == 'magic-connections':
         fuzz_magic_connections(device, package, speed, split_start, split_end)
+        exit(1)
+    
+    if args.target == 'local-long-pips':
+        fuzz_local_long_pips_exist(device, package, speed, split_start, split_end)
+        exit(1)
+
+    if args.target == 'iob-direct-pips':
+        fuzz_iob_direct_exist(device, package, speed, split_start, split_end)
         exit(1)
 
     print('Creating empty bitstream')

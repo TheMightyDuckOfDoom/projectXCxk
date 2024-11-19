@@ -27,6 +27,7 @@ fuzz_all: fuzz_iob fuzz_clb fuzz_magic
 include fuzz_split.mk
 
 clean:
-	rm -f designs/*
+	rm -rf designs
+	mkdir -p designs
 	rm -f parser.out
 	rm -f parsetab.py
