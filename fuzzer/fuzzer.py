@@ -20,19 +20,45 @@ def fuzz_iob_local_long_pips_exist(device, package, speed, split_start, split_en
             print('Invalid split range')
             exit(1)
 
-    pips_filename = f'./results/{device}{package}/IOB_LOCAL_LONG_PIPS'
-    map_filename = f'./results/{device}{package}/IOB_MAPPING'
+    pips_filename = f'./results/{device}/IOB_LOCAL_LONG_PIPS'
+    map_filename = f'./results/{device}/package/{package}_IOB_MAPPING'
     if split:
         pips_filename += f'_{split_start}_to_{split_end}'
         map_filename += f'_{split_start}_to_{split_end}'
 
     if not onlyiobmapping:
-        open(pips_filename + '.txt', 'w').close()
+        with open(pips_filename + '.txt', 'w') as f:
+            with open(map_filename + '.txt', 'w') as map:
+                for pad in pads:
+                    for pin in ['I', 'O', 'T', 'Q', 'IK', 'OK']:
+                        (pip_names, log) = pips.find_local_long_pips_for_block(device, package, speed, pad, pin, True)
+                        
+                        # Write pips
+                        if not onlyiobmapping:
+                            for pip in pip_names:
+                                f.write(f'{pad}.{pin} {pip}\n')
+                            f.write('\n')
+                            f.flush()
 
-    with open(pips_filename + '.txt', 'a') as f:
+                        # Write mapping
+                        if pin == 'I':
+                            iob_name = ''
+                            if 'Fixing unconnected pin P' in log:
+                                iob_name = 'P' + log.split('Fixing unconnected pin P')[1].split('.')[0]
+                            elif 'Fixing unconnected pin U' in log:
+                                iob_name = 'U' + log.split('Fixing unconnected pin U')[1].split('.')[0]
+                            else:
+                                print(f'Error: Could not find IOB name for {pad}')
+                                exit(1)
+                            
+                            map.write(f'{iob_name} {pad}\n')
+                            map.flush()
+
+                    f.write('\n')
+    else:
         with open(map_filename + '.txt', 'w') as map:
             for pad in pads:
-                for pin in ['I', 'O', 'T', 'Q', 'IK', 'OK']:
+                for pin in ['I']:
                     (pip_names, log) = pips.find_local_long_pips_for_block(device, package, speed, pad, pin, True)
                     
                     # Write pips
@@ -56,7 +82,6 @@ def fuzz_iob_local_long_pips_exist(device, package, speed, split_start, split_en
                         map.write(f'{iob_name} {pad}\n')
                         map.flush()
 
-                f.write('\n')
 
 def fuzz_iob_direct_exist(device, package, speed, split_start, split_end):
     pads = devices.get_device_pad_names(device, package)
@@ -74,7 +99,7 @@ def fuzz_iob_direct_exist(device, package, speed, split_start, split_end):
             print('Invalid split range')
             exit(1)
 
-    pips_filename = f'./results/{device}{package}/IOB_DIRECT'
+    pips_filename = f'./results/{device}/IOB_DIRECT'
     if split:
         pips_filename += f'_{split_start}_to_{split_end}'
     with open(pips_filename + '.txt', 'w') as f:
@@ -126,7 +151,7 @@ def fuzz_clb_direct_exist(device, package, speed, split_start, split_end):
             print('Invalid split range')
             exit(1)
 
-    pips_filename = f'./results/{device}{package}/CLB_DIRECT'
+    pips_filename = f'./results/{device}/CLB_DIRECT'
     if split:
         pips_filename += f'_{split_start}_to_{split_end}'
 
@@ -179,7 +204,7 @@ def fuzz_clb_direct_exist(device, package, speed, split_start, split_end):
 def fuzz_clb_local_long_pips_exist(device, package, speed, split_start, split_end):
     rows = devices.get_device_rows(device)[:-1]
     cols = devices.get_device_cols(device)[:-1]
-    filename = f'./results/{device}{package}/CLB_LOCAL_LONG_PIPS'
+    filename = f'./results/{device}/CLB_LOCAL_LONG_PIPS'
 
     if split_start != '' and split_end != '':
         if split_start in rows and split_end in rows:
@@ -203,7 +228,7 @@ def fuzz_clb_local_long_pips_exist(device, package, speed, split_start, split_en
 
 def fuzz_local_long_pips_exist(device, package, speed, split_start, split_end):
     rows = devices.get_device_rows(device)
-    filename = f'./results/{device}{package}/LOCAL_LONG_PIPS'
+    filename = f'./results/{device}/LOCAL_LONG_PIPS'
 
     if split_start != '' and split_end != '':
         if split_start in rows and split_end in rows:
@@ -224,7 +249,7 @@ def fuzz_local_long_pips_exist(device, package, speed, split_start, split_end):
 def fuzz_magic_connections(device, package, speed, split_start, split_end):
     rows = devices.get_device_rows(device)
     cols = devices.get_device_cols(device)
-    filename = f'./results/{device}{package}/MAGIC_CONNECTIONS'
+    filename = f'./results/{device}/MAGIC_CONNECTIONS'
 
     if split_start != '' and split_end != '':
         if split_start in rows and split_end in rows:
@@ -262,8 +287,8 @@ def fuzz_magic_connections(device, package, speed, split_start, split_end):
                 f.write('\n')
 
 def fuzz_magic_connections_bitstream(device, package, speed, split_start, split_end, empty_header, empty_frames, empty_footer):
-    with open(f'./results/{device}{package}/MAGIC_CONNECTIONS.txt', 'r') as f:
-        filename = f'./results/{device}{package}/MAGIC_BITSTREAM'
+    with open(f'./results/{device}/MAGIC_CONNECTIONS.txt', 'r') as f:
+        filename = f'./results/{device}/MAGIC_BITSTREAM'
 
         rows = devices.get_device_rows(device)[:-1]
         if split_start != '' and split_end != '':
@@ -292,7 +317,7 @@ def fuzz_magic_connections_bitstream(device, package, speed, split_start, split_
                 else:
                     print(f'{start} {end} has multiple differences')
                     print(differences)
-                    diff.write(f'{start} {end}:{differences[0]}\n')
+                    diff.write(f'{start} {end}:{differences}\n')
                     diff.write('multiple differences\n')
                     exit(1)
                 diff.flush()

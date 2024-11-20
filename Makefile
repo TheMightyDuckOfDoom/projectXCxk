@@ -1,8 +1,8 @@
 # Tobias Senti <git@tsenti.li>
 
-DEVICE = 3090
-PACKAGE = PC84
-SPEED = -100
+DEVICE?= 3090
+PACKAGE?= PC84
+SPEED?= -100
 
 LCA2BIT = ./lca2bit.py
 PARSE = ./parse.py --device $(DEVICE)

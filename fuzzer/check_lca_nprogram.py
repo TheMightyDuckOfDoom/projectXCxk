@@ -36,28 +36,28 @@ def run(fin, device, package):
     print(f'Found {len(routes)} routes')
 
     magic_connections = []
-    with open(f'./results/{device}{package}/MAGIC_CONNECTIONS.txt', 'r') as f:
+    with open(f'./results/{device}}/MAGIC_CONNECTIONS.txt', 'r') as f:
         for line in f:
             if line == '\n' or line == '':
                 continue
             magic_connections.append(line.replace('\n', ''))
 
     clb_local_long_pips = []
-    with open(f'./results/{device}{package}/CLB_LOCAL_LONG_PIPS.txt', 'r') as f:
+    with open(f'./results/{device}/CLB_LOCAL_LONG_PIPS.txt', 'r') as f:
         for line in f:
             if line == '\n' or line == '':
                 continue
             clb_local_long_pips.append(line.replace('\n', '').split(' ')[1])
 
     iob_local_long_pips = []
-    with open(f'./results/{device}{package}/IOB_LOCAL_LONG_PIPS.txt', 'r') as f:
+    with open(f'./results/{device}/IOB_LOCAL_LONG_PIPS.txt', 'r') as f:
         for line in f:
             if line == '\n' or line == '':
                 continue
             iob_local_long_pips.append(line.replace('\n', '').split(' ')[1])
 
     pips = []
-    with open(f'./results/{device}{package}/LOCAL_LONG_PIPS.txt', 'r') as f:
+    with open(f'./results/{device}/LOCAL_LONG_PIPS.txt', 'r') as f:
         for line in f:
             if line == '\n' or line == '':
                 continue

@@ -6,7 +6,7 @@ from xcxk import devices
 
 def run(device, package):
     documented_bits = []
-    with open(f'./results/{device}{package}/MAGIC_BITSTREAM.txt', 'r') as f:
+    with open(f'./results/{device}/MAGIC_BITSTREAM.txt', 'r') as f:
         for line in f:
             if line == '\n' or line == '':
                 continue

@@ -2,7 +2,7 @@
 
 This project is based on [JohnDMcMaster/project2064](https://github.com/JohnDMcMaster/project2064).
 
-The current target is the XC3090PC84.
+The current target is the XC3000.
 
 Both the XC3000A and XC3000L have additional routing resources.
 Getting the configuration for these should be quite simple once we have the XC3000.
@@ -13,21 +13,13 @@ This project is still under development;
  some parts may not yet be fully functional, and existing interfaces,
  toolflows, and conventions may be broken without prior notice.
 
-## Why XC3000 and not XC2000?
-
-The main reason for this decision are the directional buffers in both architectures.
-These are only visible in XACT for the XC3000.
-When the time comes to find out how these are configured, we can check their location in XACT
-and choose routes that switch these buffers.
-We do not know where these buffers are in the XC2000.
-
 ## Documentation
 
 - [XC3000](doc/XC3000/)
     - [IOBs](doc/XC3000/IOB.md)
     - [CLBs](doc/XC3000/CLB.md)
 
-## Roadmap
+## Goals
 
 1. General understanding of the XC3000 architecture.
     - LCA format

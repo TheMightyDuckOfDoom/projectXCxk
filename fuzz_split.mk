@@ -1,12 +1,13 @@
 FUZZ_IOB=iob-local-long-pips iob-direct-pips
 FUZZ_ROW_MINUS_ONE=clb-local-long-pips clb-direct-pips
 FUZZ_ROW=magic-connections local-long-pips
-RESULT_FOLDER=$(DEVICE)$(PACKAGE)
+RESULT_FOLDER=$(DEVICE)
 TIMESTAMP=$(shell date +%Y_%m_%d_%H_%M_%S)
 ARGS=
 
 $(RESULT_FOLDER):
 	mkdir -p ./results/$(RESULT_FOLDER)
+	mkdir -p ./results/$(RESULT_FOLDER)/package
 
 fuzz_all: $(FUZZ_IOB) $(FUZZ_ROW_MINUS_ONE) $(FUZZ_ROW)
 
@@ -87,27 +88,27 @@ $(FUZZ_ROW): $(RESULT_FOLDER)
 
 fuzz_backup: $(RESULT_FOLDER)
 	mkdir -p ./results/.backup/
-	cp ./results/$(DEVICE)$(PACKAGE) ./results/.backup/$(DEVICE)$(PACKAGE)_${TIMESTAMP} -r
+	cp ./results/$(RESULT_FOLDER) ./results/.backup/$(RESULT_FOLDER)_${TIMESTAMP} -r
 
 merge_iobmapping: fuzz_backup
-	ls -v ./results/${DEVICE}${PACKAGE}/IOB_MAPPING_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_MAPPING.txt
+	ls -v ./results/${RESULT_FOLDER}/package/${PACKAGE}_IOB_MAPPING_*.txt | xargs cat > ./results/${RESULT_FOLDER}/package/${PACKAGE}_IOB_MAPPING.txt
 
 merge_fuzz: fuzz_backup
-	ls -v ./results/${DEVICE}${PACKAGE}/CLB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/CLB_LOCAL_LONG_PIPS.txt
-	ls -v ./results/${DEVICE}${PACKAGE}/IOB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_LOCAL_LONG_PIPS.txt
-	ls -v ./results/${DEVICE}${PACKAGE}/IOB_MAPPING_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_MAPPING.txt
-	ls -v ./results/${DEVICE}${PACKAGE}/MAGIC_CONNECTIONS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/MAGIC_CONNECTIONS.txt
-	ls -v ./results/${DEVICE}${PACKAGE}/MAGIC_BITSTREAM_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/MAGIC_BITSTREAM.txt
-	ls -v ./results/${DEVICE}${PACKAGE}/LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/LOCAL_LONG_PIPS.txt
-	ls -v ./results/${DEVICE}${PACKAGE}/IOB_DIRECT_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/IOB_DIRECT.txt
-	ls -v ./results/${DEVICE}${PACKAGE}/CLB_DIRECT_*.txt | xargs cat > ./results/${DEVICE}${PACKAGE}/CLB_DIRECT.txt
+	ls -v ./results/${RESULT_FOLDER}/CLB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${RESULT_FOLDER}/CLB_LOCAL_LONG_PIPS.txt
+	ls -v ./results/${RESULT_FOLDER}/IOB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${RESULT_FOLDER}/IOB_LOCAL_LONG_PIPS.txt
+	ls -v ./results/${RESULT_FOLDER}/package/${PACKAGE}_IOB_MAPPING_*.txt | xargs cat > ./results/${RESULT_FOLDER}/package/${PACKAGE}_IOB_MAPPING.txt
+	ls -v ./results/${RESULT_FOLDER}/MAGIC_CONNECTIONS_*.txt | xargs cat > ./results/${RESULT_FOLDER}/MAGIC_CONNECTIONS.txt
+#ls -v ./results/${RESULT_FOLDER}/MAGIC_BITSTREAM_*.txt | xargs cat > ./results/${RESULT_FOLDER}/MAGIC_BITSTREAM.txt
+	ls -v ./results/${RESULT_FOLDER}/LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${RESULT_FOLDER}/LOCAL_LONG_PIPS.txt
+	ls -v ./results/${RESULT_FOLDER}/IOB_DIRECT_*.txt | xargs cat > ./results/${RESULT_FOLDER}/IOB_DIRECT.txt
+	ls -v ./results/${RESULT_FOLDER}/CLB_DIRECT_*.txt | xargs cat > ./results/${RESULT_FOLDER}/CLB_DIRECT.txt
 
 clean_fuzz: fuzz_backup
-	rm -f ./results/${DEVICE}${PACKAGE}/CLB_LOCAL_LONG_PIPS_*.txt
-	rm -f ./results/${DEVICE}${PACKAGE}/IOB_LOCAL_LONG_PIPS_*.txt
-	rm -f ./results/${DEVICE}${PACKAGE}/IOB_MAPPING_*.txt
-	rm -f ./results/${DEVICE}${PACKAGE}/MAGIC_CONNECTIONS_*.txt
-	rm -f ./results/${DEVICE}${PACKAGE}/MAGIC_BITSTREAM_*.txt
-	rm -f ./results/${DEVICE}${PACKAGE}/LOCAL_LONG_PIPS_*.txt
-	rm -f ./results/${DEVICE}${PACKAGE}/IOB_DIRECT_*.txt
-	rm -f ./results/${DEVICE}${PACKAGE}/CLB_DIRECT_*.txt
+	rm -f ./results/${RESULT_FOLDER}/CLB_LOCAL_LONG_PIPS_*.txt
+	rm -f ./results/${RESULT_FOLDER}/IOB_LOCAL_LONG_PIPS_*.txt
+	rm -f ./results/${RESULT_FOLDER}/package/${PACKAGE}_IOB_MAPPING_*.txt
+	rm -f ./results/${RESULT_FOLDER}/MAGIC_CONNECTIONS_*.txt
+	rm -f ./results/${RESULT_FOLDER}/MAGIC_BITSTREAM_*.txt
+	rm -f ./results/${RESULT_FOLDER}/LOCAL_LONG_PIPS_*.txt
+	rm -f ./results/${RESULT_FOLDER}/IOB_DIRECT_*.txt
+	rm -f ./results/${RESULT_FOLDER}/CLB_DIRECT_*.txt
