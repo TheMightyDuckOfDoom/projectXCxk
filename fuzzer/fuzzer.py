@@ -13,8 +13,11 @@ def fuzz_iob_local_long_pips_exist(device, package, speed, split_start, split_en
 
     split = False
     if split_start != '' and split_end != '':
-        if split_start in pads and split_end in pads:
-            pads = pads[pads.index(split_start):pads.index(split_end)+1]
+        if split_start in pads:
+            if split_end in pads:
+                pads = pads[pads.index(split_start):pads.index(split_end)+1]
+            else:
+                pads = pads[pads.index(split_start):]
             split = True
         else:
             print('Invalid split range')
@@ -92,8 +95,11 @@ def fuzz_iob_direct_exist(device, package, speed, split_start, split_end):
 
     split = False
     if split_start != '' and split_end != '':
-        if split_start in pads and split_end in pads:
-            pads = pads[pads.index(split_start):pads.index(split_end)+1]
+        if split_start in pads:
+            if split_end in pads:
+                pads = pads[pads.index(split_start):pads.index(split_end)+1]
+            else:
+                pads = pads[pads.index(split_start):]
             split = True
         else:
             print('Invalid split range')

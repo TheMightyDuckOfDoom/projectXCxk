@@ -12,17 +12,19 @@ def find_local_long_pips(dev, package, speed, row):
 
     pip_names = []
     for col in cols:
-        for long_start in long_wires:
-            for local_end in local_wires:
-                pip_names.append(f'col.{col}.long.{long_start}:row.{row}.local.{local_end}')
-            for long_end in long_wires:
-                pip_names.append(f'col.{col}.long.{long_start}:row.{row}.long.{long_end}')
+        for post in ['', '-l', '-s']:
+            for long_start in long_wires:
+                for local_end in local_wires:
+                    pip_names.append(f'col.{col}.long.{long_start}:row.{row}.local.{local_end}{post}')
+                for long_end in long_wires:
+                    pip_names.append(f'col.{col}.long.{long_start}:row.{row}.long.{long_end}{post}')
 
-        for local_start in local_wires:
-            for local_end in local_wires:
-                pip_names.append(f'col.{col}.local.{local_start}:row.{row}.local.{local_end}')
-            for long_end in long_wires:
-                pip_names.append(f'col.{col}.local.{local_start}:row.{row}.long.{long_end}')
+            for local_start in local_wires:
+                for local_end in local_wires:
+                    pip_names.append(f'col.{col}.local.{local_start}:row.{row}.local.{local_end}{post}')
+                for long_end in long_wires:
+                    pip_names.append(f'col.{col}.local.{local_start}:row.{row}.long.{long_end}{post}')
+            break
     
     lca = ''
     for name in pip_names:

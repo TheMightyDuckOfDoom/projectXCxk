@@ -59,7 +59,7 @@ $(FUZZ_ROW_MINUS_ONE): $(RESULT_FOLDER)
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start S --split_end S &
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start T --split_end T &
 
-$(FUZZ_ROW): $(RESULT_FOLDER)
+$(FUZZ_ROW) magic-bitstream: $(RESULT_FOLDER)
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start A --split_end A &
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start B --split_end B &
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start C --split_end C &
@@ -98,7 +98,7 @@ merge_fuzz: fuzz_backup
 	ls -v ./results/${RESULT_FOLDER}/IOB_LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${RESULT_FOLDER}/IOB_LOCAL_LONG_PIPS.txt
 	ls -v ./results/${RESULT_FOLDER}/package/${PACKAGE}_IOB_MAPPING_*.txt | xargs cat > ./results/${RESULT_FOLDER}/package/${PACKAGE}_IOB_MAPPING.txt
 	ls -v ./results/${RESULT_FOLDER}/MAGIC_CONNECTIONS_*.txt | xargs cat > ./results/${RESULT_FOLDER}/MAGIC_CONNECTIONS.txt
-#ls -v ./results/${RESULT_FOLDER}/MAGIC_BITSTREAM_*.txt | xargs cat > ./results/${RESULT_FOLDER}/MAGIC_BITSTREAM.txt
+#	ls -v ./results/${RESULT_FOLDER}/MAGIC_BITSTREAM_*.txt | xargs cat > ./results/${RESULT_FOLDER}/MAGIC_BITSTREAM.txt
 	ls -v ./results/${RESULT_FOLDER}/LOCAL_LONG_PIPS_*.txt | xargs cat > ./results/${RESULT_FOLDER}/LOCAL_LONG_PIPS.txt
 	ls -v ./results/${RESULT_FOLDER}/IOB_DIRECT_*.txt | xargs cat > ./results/${RESULT_FOLDER}/IOB_DIRECT.txt
 	ls -v ./results/${RESULT_FOLDER}/CLB_DIRECT_*.txt | xargs cat > ./results/${RESULT_FOLDER}/CLB_DIRECT.txt

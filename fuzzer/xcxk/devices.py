@@ -2,8 +2,8 @@
 
 architectures = {
     '3000': {
-        'local_wires': [i for i in range(0, 12)],
-        'long_wires': [0, 1, 2, 3, 4, 5]
+        'local_wires': [i for i in range(0, 20)],
+        'long_wires': [i for i in range(0, 20)]
     }
 }
 
@@ -18,6 +18,15 @@ def get_dev_long_wires(dev):
     return architectures[devices[dev]['arch']]['long_wires']
 
 devices = {
+    '3020': {
+        'arch': '3000',
+        'rows': 8,
+        'cols': 8,
+        'max_ios': 64,
+        'packages': ['PC84'],
+        'num_frames': 197,
+        'frame_bits': 75 - 4,
+    },
     '3090': {
         'arch': '3000',
         'rows': 20,
@@ -67,26 +76,32 @@ def get_device_cols(dev):
     return abc[:ncols]
 
 def get_device_iob_names(dev, package):
+    exclude = []
     if package in ['PC84']:
-        if dev in ['3064', '3090', '3195']:
-            iob_names = []
-            for i in range(1, 85):
-                if i in [1, 2, 12, 13, 21, 22, 31, 32, 42, 43, 54, 55, 64, 65, 74]:
-                    continue
-                iob_names.append(f'P{i}')
+        if dev in ['3020']:
+            exclude = [12, 13, 14, 22, 31, 32, 33, 34, 38, 41, 43, 50, 51, 54, 55, 69, 74, 79, 80, 1, 6, 7]
+        if dev in ['3064', '3090', '3195A']:
+            exclude = [1, 2, 12, 13, 21, 22, 31, 32, 42, 43, 54, 55, 64, 65, 74]
+    elif package in ['PQ160']:
+        if dev in ['3090', '3195A']:
+            exclude = [19, 20, 40, 41, 42, 43, 60, 61, 77, 78, 79, 80, 100, 101, 121, 122, 123, 157, 158, 159, 160]
+
+    iob_names = []
+    for i in range(1, 85):
+        if i in exclude:
+            continue
+        iob_names.append(f'P{i}')
+
+    if package in ['PC84']:
+        if dev in ['3020']:
+            assert(len(iob_names) == 64)
+        if dev in ['3064', '3090', '3195A']:
             assert(len(iob_names) == 70)
-            return iob_names
     elif package in ['PQ160']:
         if dev in ['3090', '3195']:
-            iob_names = []
-            for i in range(1, 161):
-                if i in [19, 20, 40, 41, 42, 43, 60, 61, 77, 78, 79, 80, 100, 101, 121, 122, 123, 157, 158, 159, 160]:
-                    continue
-                iob_names.append(f'P{i}')
             assert(len(iob_names) == 138)
-            return iob_names
     
-    return None
+    return iob_names
 
 def get_device_pad_names(dev, package):
     if not is_device_valid(dev):

@@ -10,6 +10,8 @@ col.A.long.4:row.A.long.2
 col.A.long.5:row.A.local.4
 col.A.long.5:row.A.local.6
 col.A.long.5:row.A.long.2
+col.A.long.6:row.A.local.2
+col.A.long.6:row.A.local.5
 col.A.local.1:row.A.local.1
 col.A.local.1:row.A.long.3
 col.A.local.2:row.A.local.2
@@ -35,6 +37,8 @@ col.A.local.10:row.A.local.4
 col.A.local.11:row.A.local.2
 col.A.local.11:row.A.local.10
 col.A.local.11:row.A.long.2
+col.A.local.12:row.A.local.6
+col.A.local.12:row.A.local.11
 col.B.long.0:row.A.local.2
 col.B.long.0:row.A.local.5
 col.B.long.1:row.A.local.2
@@ -7108,6 +7112,7 @@ col.A.local.10:row.U.local.2
 col.A.local.11:row.U.local.1
 col.A.local.11:row.U.local.3
 col.A.local.11:row.U.local.5
+col.A.local.13:row.U.local.10
 col.B.long.0:row.U.local.5
 col.B.long.1:row.U.local.0
 col.B.long.1:row.U.local.4

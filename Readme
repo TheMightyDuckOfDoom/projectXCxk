@@ -18,6 +18,7 @@ This project is still under development;
 - [XC3000](doc/XC3000/)
     - [IOBs](doc/XC3000/IOB.md)
     - [CLBs](doc/XC3000/CLB.md)
+    - [Routing](doc/XC3000/ROUTING.md)
 
 ## Goals
 
