@@ -1,6 +1,5 @@
 FUZZ_IOB=iob-local-long-pips iob-direct-pips
-FUZZ_ROW_MINUS_ONE=clb-local-long-pips clb-direct-pips
-FUZZ_ROW=magic-connections local-long-pips
+FUZZ_ROW=magic-connections local-long-pips clb-local-long-pips clb-direct-pips
 RESULT_FOLDER=$(DEVICE)
 TIMESTAMP=$(shell date +%Y_%m_%d_%H_%M_%S)
 ARGS=
@@ -33,31 +32,10 @@ $(FUZZ_IOB): $(RESULT_FOLDER)
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD121 --split_end PAD128 $(ARGS) &
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD129 --split_end PAD136 $(ARGS) &
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD137 --split_end PAD144 $(ARGS) &
-
-$(FUZZ_ROW_MINUS_ONE): $(RESULT_FOLDER)
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start A --split_end A &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start B --split_end B &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start C --split_end C &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start D --split_end D &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start E --split_end E &
-
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start F --split_end F &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start G --split_end G &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start H --split_end H &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start I --split_end I &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start J --split_end J &
-
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start K --split_end K &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start L --split_end L &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start M --split_end M &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start N --split_end N &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start O --split_end O &
-
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start P --split_end P &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start Q --split_end Q &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start R --split_end R &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start S --split_end S &
-	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start T --split_end T &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD145 --split_end PAD152 $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD153 --split_end PAD160 $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD161 --split_end PAD168 $(ARGS) &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start PAD169 --split_end PAD176 $(ARGS) &
 
 $(FUZZ_ROW) magic-bitstream: $(RESULT_FOLDER)
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start A --split_end A &
@@ -85,6 +63,8 @@ $(FUZZ_ROW) magic-bitstream: $(RESULT_FOLDER)
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start T --split_end T &
 
 	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start U --split_end U &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start V --split_end V &
+	./fuzzer/fuzzer.py --target $@ --device $(DEVICE) --package $(PACKAGE) --speed $(SPEED) --split_start W --split_end W &
 
 fuzz_backup: $(RESULT_FOLDER)
 	mkdir -p ./results/.backup/

@@ -56,11 +56,11 @@ class Parser(object):
     def expect_run(self, want, minrun, msg):
         '''Keep grabbing bits of type want until not want comes'''
         ret = ''
-        while True:
+        while self.bits.pos < len(self.bits):
             p = self.bits.peek(1).uint
             if p != want:
                 break
-            ret += chr(self.bits.read(1).uint)
+            ret += str(self.bits.read(1).uint)
         if len(ret) < minrun:
             raise Exception("%s: want at least %d bits, got %d" % (msg, want, len(ret)))
         return ret

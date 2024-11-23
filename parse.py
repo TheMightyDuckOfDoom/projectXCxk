@@ -29,10 +29,10 @@ def run(f, format, dev):
     print('  length: %d' % header['length'])
     print('  pad2: %d bits (min: 4)' % len(header['pad2']))
 
-    for frame in p.frames_raw():
-        print('frame: %s' % frame['payload'])
+    for idx, frame in enumerate(p.frames_raw()):
+        print(f'frame {idx:3}: {frame["payload"]}')
     footer = p.footer()
-    print('footer: %d bits (min: 4)' % len(footer['postamble']))
+    print(f'footer: {len(footer["postamble"])} bits (min: 4): \'{footer["postamble"]}\'')
 
 def main():
     import argparse

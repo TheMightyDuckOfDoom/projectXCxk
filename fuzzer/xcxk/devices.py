@@ -35,6 +35,15 @@ devices = {
         'packages': ['PC84', 'PQ160'],
         'num_frames': 373,
         'frame_bits': 172 - 4,
+    },
+    '3195A': {
+        'arch': '3000',
+        'rows': 22,
+        'cols': 22,
+        'max_ios': 176,
+        'packages': ['PC84', 'PQ160'],
+        'num_frames': 505,
+        'frame_bits': 188 - 4,
     }
 }
 
@@ -98,9 +107,9 @@ def get_device_iob_names(dev, package):
         if dev in ['3064', '3090', '3195A']:
             assert(len(iob_names) == 70)
     elif package in ['PQ160']:
-        if dev in ['3090', '3195']:
+        if dev in ['3090', '3195A']:
             assert(len(iob_names) == 138)
-    
+
     return iob_names
 
 def get_device_pad_names(dev, package):

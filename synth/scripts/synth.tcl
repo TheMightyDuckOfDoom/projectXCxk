@@ -30,5 +30,10 @@ stat
 hierarchy -check
 stat
 
-yosys write_json ./out/[lindex $argv 1]_synth.json
-yosys write_verilog ./out/[lindex $argv 1]_synth.v
+if {[llength $argv] > 2} {
+  yosys write_json [lindex $argv 2]/[lindex $argv 1]_synth.json
+  yosys write_verilog [lindex $argv 2]/[lindex $argv 1]_synth.v
+} else {
+  yosys write_json ./out/[lindex $argv 1]_synth.json
+  yosys write_verilog ./out/[lindex $argv 1]_synth.v
+}
